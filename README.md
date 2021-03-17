@@ -14,4 +14,7 @@ The main of this project is to create a smart lamp capable of monetarizing the t
 9. Doresc sa am acces la elemente de mediu precum temperatura, luminozitate, umiditate.
 10. Doresc ca interfata sa aibe un design user friendly.
 
+# Trello 
+
+https://trello.com/b/TnOty7z8/to-do-list
 
