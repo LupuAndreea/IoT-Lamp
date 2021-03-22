@@ -43,6 +43,8 @@ public:
     void set_status(bool status)
     {
         status = status;
+	digitalWrite(led, status);
+	sleep(500);
     }
     void set_intensitate(int intensitate)
     {
