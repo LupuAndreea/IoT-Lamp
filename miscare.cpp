@@ -8,25 +8,22 @@
 #include <string.h>
 #include <typeinfo>
 
+#include <wiringPi.h>
+
 #define PORT 8080
 
 using namespace std;
 
 class Motion{
 private:
-    bool status;
-    float distanta;
+   	bool status;
+    	float distanta;
+	
+    	int TRIG;
+	int ECHO;
 public:
-    Motion()
-        {
-            ifstream in("MotionInput.txt");
-            if(in.is_open())
-            {
-                in>>status>>distanta;
-                in.close();
-            }
-            else cout<<"Eroare la deschiderea fisierului de intrare"<<endl;
-        }
+    Motion();
+    float get_distance(); 
     void scriere_fisier()
         {
             ofstream out("MotionOutput.txt");
@@ -37,25 +34,56 @@ public:
             }
             else cout<<"Eroare la deschiderea fisierului de iesire";
         }
-    void set_status(bool status)
-    {
-        status = status;
-    }
-    void set_distanta(int distanta)
-    {
-        distanta = distanta;
-    }
-   
-    bool get_status()
-    {
-        return status;
-    }
-    int get_distanta()
-    {
-        return distanta;
-    }
-    
+    void set_status(bool status){ status = status; }
+    bool get_status(){ return status; }   
 };
+
+Motion :: Motion( int trigger_pin = 23, int echo_pin = 24){
+	// get the pin values
+	TRIG = trigger_pin;
+	ECHO = echo_pin;
+
+	// set the Sonar pin 
+	wiringPiSetupGpio();
+	pinMode(TRIG, OUTPUT);
+	pinMode(ECHO, INPUT);
+
+	// stop the trigger pin
+	digitalWrite(TRIG, LOW);
+	delay(30);
+
+	// Read the modul status
+	ifstream in("MotionInput.txt");
+	if(in.is_open())
+	{
+	in>>status;
+	in.close();
+	}
+	else cout<<"Eroare la deschiderea fisierului de intrare"<<endl;
+
+	// in the beginning the distance is 0
+	distance = 0
+}
+
+float Motion :: get_distance(){
+	
+	// Start the Trigger
+	digitalWrite(TRIG, HIGH);
+	delayMicroseconds(20);
+	digitalWrite(TRIG, LOW);
+	
+	// wait for echo to start 
+	while(digitalRead(ECHO) == LOW);
+	long start_time = micros();
+	
+	// wait for echo to end
+	while(digitalRead(ECHO) == HIGH);
+	long end_time = micro();
+	
+	distance = (end_time - start_time) / 58;
+	
+	return distance;	
+}
 
 int sock = 0;
 int verificare_citire_mesaj;
