@@ -141,55 +141,36 @@ public:
 
 };
 
-class SmartLamp
-{
- 
-
-	
-
-};
-
-
-
 
 int main(int argc, char *argv[])
 {
-	 sigset_t signals;
+ sigset_t signals;
+ Port port(8080);
+ Address addr(Ipv4::any(), port);
+ SmartLampEndpoint stats(addr);
 
-	   Port port(8080);
+ SmartLamp smL;
 
-	   Address addr(Ipv4::any(), port);
+ stats.init();
+ stats.start();
 
-	   SmartLampEndpoint stats(addr);
-
-
-	   //int thr = 2;
-
-	    SmartLamp smL;
-
-	   stats.init();
-	   stats.start();
+ //cout<<"Heeelllooo!"<<endl;
 
 
-	   //cout<<"Heeelllooo!"<<endl;
+ int signal = 0;
+ int status = sigwait(&signals, &signal);
+ if (status == 0)
+ {
+	std::cout << "received signal " << signal << std::endl;
+ }
+ else
+ {
+	std::cerr << "sigwait returns " << status << std::endl;
+ }
 
+cout<<"server waiting for client command"<<endl;
 
-	
-	int signal = 0;
-    int status = sigwait(&signals, &signal);
-    if (status == 0)
-    {
-        std::cout << "received signal " << signal << std::endl;
-    }
-    else
-    {
-        std::cerr << "sigwait returns " << status << std::endl;
-    }
-  
-
-    cout<<"server waiting for client command"<<endl;
-
-    //stats.
+//stats.
 
 
 }
