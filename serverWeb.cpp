@@ -9,6 +9,10 @@
 #include <pistache/router.h>
 #include <pistache/endpoint.h>
 #include <pistache/common.h>
+#include <iostream>
+#include <fstream>
+#include <jsoncpp/json/json.h>
+
 
 #include <signal.h>
 
@@ -39,11 +43,16 @@ void printCookies(const Http::Request& req) {
 
 class SmartLampEndpoint
 {
+	Json::Value json;
 
 public:
+
 	explicit SmartLampEndpoint(Address addr)
         : httpEndpoint(std::make_shared<Http::Endpoint>(addr))
-    { }
+    { 
+    	ifstream commandFile("commands.json");
+		commandFile>>json;
+    }
 
      void init() {
         auto opts = Http::Endpoint::options();
@@ -62,26 +71,48 @@ public:
         httpEndpoint->shutdown();
     }
 
-   private:
+  private:
 
    	std::shared_ptr<Http::Endpoint> httpEndpoint;
     Rest::Router router;
 
 
-void getCommand(const Rest::Request& request, Http::ResponseWriter response)
-{
-	std::string returnString = "No Command available!";
-	auto commandString = request.param(":commandName").as<std::string>();
+	void getCommand(const Rest::Request& request, Http::ResponseWriter response)
+	{
+		std::string returnString = "No Command available!";
+		auto commandString = request.param(":commandName").as<std::string>();
+		int commandInt = stoi(commandString);
 
-	response.send(Http::Code::Ok, commandString);
+		switch(commandInt)
+		{
+			case 1:
+				
+				cout<<"Sunt aici "<<endl;
+				response.send(Http::Code::Ok, json);
+				break;
+				
+			case 2:
+				cout<<""<<endl;	
+		}
 
-	/*
-	cout<<"Gol";
-	else  
-	{cout<<commandString.c_str()<<endl;
-		cout<<"Aici2";
+
+
+    
+
+    /*
+	if(commandString == "Standard command")
+	{
+		cout<<"Standard command was called"<<endl;
+
+	cout<<"AICI!"<<endl;
+	cout<< typeid(commandInt).name()<<endl;
+
+
 	}
 	*/
+
+
+	
 }
 
 
@@ -110,6 +141,14 @@ void getCommand(const Rest::Request& request, Http::ResponseWriter response)
 
 };
 
+class SmartLamp
+{
+ 
+
+	
+
+};
+
 
 
 
@@ -126,11 +165,16 @@ int main(int argc, char *argv[])
 
 	   //int thr = 2;
 
+	    SmartLamp smL;
+
 	   stats.init();
 	   stats.start();
 
+
 	   //cout<<"Heeelllooo!"<<endl;
 
+
+	
 	int signal = 0;
     int status = sigwait(&signals, &signal);
     if (status == 0)
