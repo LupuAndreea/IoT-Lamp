@@ -45,36 +45,10 @@ class SmartLampEndpoint
 {
 	Json::Value json;
 
-public:
-
-	explicit SmartLampEndpoint(Address addr)
-        : httpEndpoint(std::make_shared<Http::Endpoint>(addr))
-    { 
-    	ifstream commandFile("commands.json");
-		commandFile>>json;
-    }
-
-     void init() {
-        auto opts = Http::Endpoint::options();
-        httpEndpoint->init(opts);
-        // Server routes are loaded up
-        setupRoutes();
-    }
-
-     void start() {
-        httpEndpoint->setHandler(router.handler());
-        httpEndpoint->serveThreaded();
-    }
-
-    // When signaled server shuts down
-    void stop(){
-        httpEndpoint->shutdown();
-    }
-
-  private:
+private:
 
    	std::shared_ptr<Http::Endpoint> httpEndpoint;
-    Rest::Router router;
+    	Rest::Router router;
 
 
 	void getCommand(const Rest::Request& request, Http::ResponseWriter response)
@@ -87,57 +61,78 @@ public:
 		{
 			case 1:
 				
-				cout<<"Sunt aici "<<endl;
+				cout << "Sunt aici " << endl;
 				response.send(Http::Code::Ok, json);
 				break;
 				
 			case 2:
-				cout<<""<<endl;	
+				cout << "" <<endl;	
 		}
+   
+
+	    /*
+		if(commandString == "Standard command")
+		{
+			cout<<"Standard command was called"<<endl;
+
+		cout<<"AICI!"<<endl;
+		cout<< typeid(commandInt).name()<<endl;
 
 
-
-    
-
-    /*
-	if(commandString == "Standard command")
-	{
-		cout<<"Standard command was called"<<endl;
-
-	cout<<"AICI!"<<endl;
-	cout<< typeid(commandInt).name()<<endl;
-
-
-	}
-	*/
-
-
+		}
+		*/
 	
-}
+	}
 
 
-      void setupRoutes() {
-        using namespace Rest;
-        // Defining various endpoints
-        // Generally say that when http://localhost:9080/ready is called, the handleReady function should be called. 
-        Routes::Get(router, "/ready", Routes::bind(&Generic::handleReady));
-        Routes::Get(router, "/auth", Routes::bind(&SmartLampEndpoint::doAuth, this));
-        Routes::Get(router,"/command/:commandName", Routes::bind(&SmartLampEndpoint::getCommand,this));
-       // Routes::Post(router, "/settings/:settingName/:value", Routes::bind(&MicrowaveEndpoint::setSetting, this));
-        //Routes::Get(router, "/settings/:settingName/", Routes::bind(&MicrowaveEndpoint::getSetting, this));
-    }
+      	void setupRoutes() {
+		using namespace Rest;
+		// Defining various endpoints
+		// Generally say that when http://localhost:9080/ready is called, the handleReady function should be called. 
+		Routes::Get(router, "/ready", Routes::bind(&Generic::handleReady));
+		Routes::Get(router, "/auth", Routes::bind(&SmartLampEndpoint::doAuth, this));
+		Routes::Get(router,"/command/:commandName", Routes::bind(&SmartLampEndpoint::getCommand,this));
+		// Routes::Post(router, "/settings/:settingName/:value", Routes::bind(&MicrowaveEndpoint::setSetting, this));
+		//Routes::Get(router, "/settings/:settingName/", Routes::bind(&MicrowaveEndpoint::getSetting, this));
+        }
 
 
-    void doAuth(const Rest::Request& request, Http::ResponseWriter response) {
-        // Function that prints cookies
-        printCookies(request);
-        // In the response object, it adds a cookie regarding the communications language.
-        response.cookies()
-            .add(Http::Cookie("lang", "en-US"));
-        // Send the response
-        response.send(Http::Code::Ok);
-    }
+	void doAuth(const Rest::Request& request, Http::ResponseWriter response) {
+		// Function that prints cookies
+		printCookies(request);
+		// In the response object, it adds a cookie regarding the communications language.
+		response.cookies()
+		    .add(Http::Cookie("lang", "en-US"));
+		// Send the response
+		response.send(Http::Code::Ok);
+	}
+	
+public:
 
+	explicit SmartLampEndpoint(Address addr)
+        : httpEndpoint(std::make_shared<Http::Endpoint>(addr))
+    	{ 
+    		ifstream commandFile("commands.json");
+		commandFile >> json;
+    	}
+
+    	 void init() {
+        	auto opts = Http::Endpoint::options();
+        	httpEndpoint->init(opts);
+		 
+        	// Server routes are loaded up
+       		 setupRoutes();
+    	}
+
+    	 void start() {
+        	httpEndpoint->setHandler(router.handler());
+        	httpEndpoint->serveThreaded();
+   	}
+
+   	 // When signaled server shuts down
+   	 void stop(){
+        	httpEndpoint->shutdown();
+   	}
 
 };
 
@@ -168,7 +163,7 @@ int main(int argc, char *argv[])
 	std::cerr << "sigwait returns " << status << std::endl;
  }
 
-cout<<"server waiting for client command"<<endl;
+cout << "server waiting for client command" << endl;
 
 //stats.
 
