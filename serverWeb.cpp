@@ -44,6 +44,8 @@ void printCookies(const Http::Request& req) {
 class SmartLampEndpoint
 {
 	Json::Value json;
+	Json::FastWriter fastWriter;
+	std::string output;
 
 private:
 
@@ -57,30 +59,15 @@ private:
 		auto commandString = request.param(":commandName").as<std::string>();
 		int commandInt = stoi(commandString);
 
-		switch(commandInt)
-		{
-			case 1:
-				
-				cout << "Sunt aici " << endl;
-				response.send(Http::Code::Ok, json);
-				break;
-				
-			case 2:
-				cout << "" <<endl;	
+		
+		if (commandInt >= 1 && commandInt <= 5) 
+		{   
+			output = fastWriter.write(json["input-buffers"][commandString]);
+			cout<<"Am trimis comanda "<<json["input-buffers"][commandString]["name"];
+			response.send(Http::Code::Ok, output);
+			
 		}
    
-
-	    /*
-		if(commandString == "Standard command")
-		{
-			cout<<"Standard command was called"<<endl;
-
-		cout<<"AICI!"<<endl;
-		cout<< typeid(commandInt).name()<<endl;
-
-
-		}
-		*/
 	
 	}
 
