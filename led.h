@@ -9,7 +9,11 @@
 #include <unistd.h>
 #include <string.h>
 #include <typeinfo>
-#define PORT 8080
+#include <jsoncpp/json/json.h>
+#include <boost/lexical_cast.hpp>
+#include <sstream>
+
+#define PORT 8081
 
 using namespace std;
 
@@ -33,6 +37,15 @@ public:
             }
             else cout<<"Eroare la deschiderea fisierului de intrare"<<endl;
         }
+
+
+    void preluare_date_json(Json::Value json)
+    {
+        
+        cout << "Nu contez" << endl;
+      // cout << json["stat"];
+
+    }
     void scriere_fisier()
         {
             ofstream out("SunetOutput.txt");
@@ -43,28 +56,78 @@ public:
             }
             else cout<<"Eroare la deschiderea fisierului de iesire";
         }
-    void set_status(bool status)
+
+    void set_status(Json::Value json)
     {
-        status = status;
-	//digitalWrite(led, status);
-	sleep(500);
+
+         if (json["status_led"] == true)
+         { 
+            status = true;
+         }
+
+         else 
+         {  
+            status = false;
+         }
+
+         cout << "status: "<< status;
+
     }
-    void set_intensitate(int intensitate)
+
+    void set_intensitate(Json::Value json)
     {
-        intensitate = intensitate;
+        Json::FastWriter fastWriter;
+        std::string string_intensitate = fastWriter.write(json["intensity"]);
+
+        stringstream geek(string_intensitate);
+
+        geek >> intensitate;
+
+       // cout << "Value of string_intensitate: " << string_intensitate;
+
+       // cout << "Value of intensitate: " << intensitate; 
     }
-    void set_culoare(string culoare)
+
+
+    void set_culoare(Json::Value json)
     {
-        culoare = culoare;
+          
+        Json::FastWriter fastWriter;
+        culoare = fastWriter.write(json["color"]);
+
+       // cout << "Color: " << culoare;
+
     }
-    void set_timer (int timer)
+
+    void set_timer (Json::Value json)
     {
-        timer = timer;
+         
+        Json::FastWriter fastWriter;
+        std::string string_timer = fastWriter.write(json["timer"]);
+
+        stringstream geek(string_timer);
+
+        geek >> timer;
+
+       // cout << "Value of timer: " << timer; 
+
     }
-    void set_status_timer(bool status_timer)
+
+    void set_status_timer(Json::Value json)
     {
-        status_timer = status_timer;
+         if (json["status_timer"] == true)
+         { 
+            status_timer = true;
+         }
+
+         else 
+         {  
+            status_timer = false;
+         }
+
+        // cout << "status_timer: "<< status_timer;
     }
+
     bool get_status()
     {
         return status;
@@ -96,7 +159,7 @@ char * buffer_de_scriere = NULL;
 
 int conectare_la_server(){
 
-	buffer_de_scriere = new char[(sizeof"Hello from client!")];
+	buffer_de_scriere = new char[1024];
 	strcpy(buffer_de_scriere ,"Hello from client!");
 
 	buffer_de_citire = new char [1024];
