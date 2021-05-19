@@ -9,15 +9,21 @@
 #include <unistd.h>
 #include <string.h>
 #include <typeinfo>
+#include <jsoncpp/json/json.h>
+#include <boost/lexical_cast.hpp>
+#include <sstream>
+
 #define PORT 8080
 
 using namespace std;
 
 class Sunet{
 private:
-    bool status;
-    int volum;
-    string tip;
+    bool notifications;
+    bool status_sound;
+    string sound_type;
+    int volume;
+
 public:
 
     Sunet()
@@ -30,6 +36,15 @@ public:
             }
             else cout<<"Eroare la deschiderea fisierului de intrare"<<endl;
         }
+
+    void preluare_date_json(Json::Value json)
+    {
+
+        cout << "Nu contez" << endl;
+      // cout << json["stat"];
+
+    }
+
     void scriere_fisier()
         {
             ofstream out("SunetOutput.txt");
@@ -40,30 +55,88 @@ public:
             }
             else cout<<"Eroare la deschiderea fisierului de iesire";
         }
-    void set_status(bool status)
+
+    void set_notifications(Json::Value json)
     {
-        status = status;
+        if(json["notifications"] != null)
+        {
+            if (json["notifications"] == true)
+            {
+                notifications = true;
+            }
+
+            else
+            {
+                notifications = false;
+            }
+
+            cout << "Notifications: "<< notifications;
+        }
     }
-    void set_volum(int volum)
+
+    void set_status(Json::Value json)
     {
-        volum = volum;
+        if(json["status_sound"] != null)
+        {
+            if (json["status_sound"] == true)
+            {
+                status_sound = true;
+            }
+
+            else
+            {
+                status_sound = false;
+            }
+
+            cout << "Status_sound: "<< status_sound;
+        }
     }
-    void set_tip(string tip)
+
+    void set_soundType(Json::Value json)
     {
-        tip = tip;
+        if(json["sound_type"] != null)
+        {
+            Json::FastWriter fastWriter;
+            sound_type = fastWriter.write(json["sound_type"]);
+             // cout << "Sound type: " << sound_type;
+        }
     }
+
+    void set_volume(Json::Value json)
+    {
+        if(json["volume"] != null)
+        {
+            Json::FastWriter fastWriter;
+            string volume = fastWriter.write(json["volume"]);
+
+            stringstream geek(volume);
+
+            geek >> volume;
+
+            // cout << "Volume: " << volume;
+        }
+    }
+
+    bool get_notifications()
+    {
+        return notifications;
+    }
+
     bool get_status()
     {
-        return status;
+        return status_sound;
     }
-    int get_volum()
+
+    string get_soundType()
     {
-        return volum;
+        return sound_type;
     }
-    string get_tip()
+
+    int get_volume()
     {
-        return tip;
+        return volume;
     }
+
 };
 
 int sock = 0;
