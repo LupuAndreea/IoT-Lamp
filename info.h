@@ -1,17 +1,28 @@
 #ifndef INFO_H
 #define INFO_H
+
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
 #include <stdbool.h>
+#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
 #include <typeinfo>
+#include <jsoncpp/json/json.h>
+#include <boost/lexical_cast.hpp>
+#include <sstream>
 
 #define PORT 8080
 
 using namespace std;
+
+char buffer[1024];
+
+int sock = 0;
+int verificare_citire_mesaj;
+struct sockaddr_in serv_addr;
 
 class Info {
     private:
@@ -19,6 +30,9 @@ class Info {
         string data;
         string timp;
         string calendar;
+	
+	Json::Value json;
+	
     public:
         Info() {
             ifstream in("input.txt");
@@ -27,87 +41,211 @@ class Info {
                 in.close();
             }
             else
-                cout<<"Eroare la citire";
-        }
-        void scriere_fisier()
-        {
-            ofstream out("output.txt");
-            if(out.is_open()) {
-                out<<"Locatie: "<<locatie<<endl<<"Data: "<<data<<endl<<"Ora: "<<timp<<endl<<"Date importante: "<<calendar<<endl;
-                out.close();
-            }
-            else
-                cout<<"Eroare la scriere";
-        }
-        string get_locatie() {
-            return locatie;
-        }
-        void set_locatie(string locatie) {
-            locatie = locatie;
-        }
-        string get_data() {
-            return data;
-        }
-        void set_data(string data) {
-            data = data;
-        }
-        string get_timp() {
-            return timp;
-        }
-        void set_timp(string timp) {
-            timp = timp;
-        }
-        string get_calendar() {
-            return calendar;
-        }
-        void set_calendar(string calendar) {
-            calendar = calendar;
-        }
-};
+
+#ifndef SUNET_H
+#define SUNET_H
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
+#include <stdbool.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <string.h>
+#include <typeinfo>
+#include <jsoncpp/json/json.h>
+#include <boost/lexical_cast.hpp>
+#include <sstream>
+
+#define PORT 8080
+
+using namespace std;
+
+char buffer[1024];
 
 int sock = 0;
 int verificare_citire_mesaj;
 struct sockaddr_in serv_addr;
 
-char * buffer_de_citire = NULL;
-char * buffer_de_scriere = NULL;
+
+class Sunet{
+private:
+    bool notifications;
+    bool status_sound;
+    string sound_type;
+    int volume;
+
+    Json::Value json;
+
+public:
+
+    Sunet()
+        {
+            ifstream in("SunetInput.txt");
+            if(in.is_open())
+            {
+                in>>notifications>>status_sound>>volume>>sound_type;
+                in.close();
+            }
+            else cout<<"Eroare la deschiderea fisierului de intrare"<<endl;
+        }
+	void stringToJson() {
+		//string res1 = to_string(res);
+		Json::Reader reader;
+		string temp = string(buffer);
+		cout << buffer<<endl;
+
+		bool parsingSuccessful = reader.parse( temp.c_str(), json);
+
+		if ( !parsingSuccessful )
+		{
+
+		    cout << "Error parsing the string" << endl;
+		}
+
+		json = json["information"];
+		cout << json;	
+	}
+	void procesare_json() {
+		this->stringToJson();
+		this->set_locatie();
+		this->set_data();
+		this->set_timp();
+		this->set_calendar();
+		this->scriere_fisier();
+	}
+	void scriere_fisier() {
+            ofstream out("SunetOutput.txt");
+            if(out.is_open())
+            {
+                out << "Location: " << location << endl;
+                out << "Date: " << date << endl;
+                out << "Time: " << time << endl;
+                out << "Calendar: " << calendar << endl;
+                out.close();
+            }
+            else cout<<"Eroare la deschiderea fisierului de iesire";
+	}
+        string get_locatie() {
+            return locatie;
+        }
+        void set_locatie(string locatie) {
+		if(json["location"] != "null")
+		{
+		    if (json["location"] == true)
+		    {
+			location = true;
+		    }
+
+		    else
+		    {
+			location = false;
+		    }
+
+		}
+        }
+        string get_data() {
+            return data;
+        }
+        void set_data(string data) {
+		if(json["date"] != "null")
+		{
+		    if (json["date"] == true)
+		    {
+			date = true;
+		    }
+
+		    else
+		    {
+			date = false;
+		    }
+
+		}
+        }
+        string get_timp() {
+            return timp;
+        }
+        void set_timp(string timp) {
+		if(json["time"] != "null")
+		{
+		    if (json["time"] == true)
+		    {
+			time = true;
+		    }
+
+		    else
+		    {
+			time = false;
+		    }
+
+		}
+        }
+        string get_calendar() {
+            return calendar;
+        }
+        void set_calendar(string calendar) {
+		if(json["calendar"] != "null")
+		{
+		    if (json["calendar"] == true)
+		    {
+			calendar = true;
+		    }
+
+		    else
+		    {
+			calendar = false;
+		    }
+
+		}
+        }
+};
 
 int conectare_la_server(){
 
-	buffer_de_scriere = new char[(sizeof"Hello from client!")];
-	strcpy(buffer_de_scriere ,"Hello from client!");
-
-	buffer_de_citire = new char [1024];
-
-	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        printf("\n Socket creation error \n");
-        return -1;
+    int clientSocket, ret;
+    struct sockaddr_in serverAddr;
+    Sunet s;
+    
+    clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if(clientSocket < 0){
+        printf("[-]Error in connection.\n");
+        exit(1);
     }
+    printf("[+]Client Socket is created.\n");
 
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
+    memset(&serverAddr, '\0', sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(PORT);
+    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    // Convert IPv4 and IPv6 addresses from text to binary form
-    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)
-    {
-        printf("\nInvalid address/ Address not supported \n");
-        return -1;
+    ret = connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+    if(ret < 0){
+        printf("[-]Error in connection.\n");
+        exit(1);
     }
+    printf("[+]Connected to Server.\n");
 
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-    {
-        printf("\nConnection Failed \n");
-        return -1;
+    while(1){
+        printf("Client: \t");
+        scanf("%s", &buffer[0]);
+        send(clientSocket, buffer, strlen(buffer), 0);
+
+        if(strcmp(buffer, ":exit") == 0){
+            close(clientSocket);
+            printf("[-]Disconnected from server.\n");
+            exit(1);
+        }
+
+        if(recv(clientSocket, buffer, 1024, 0) < 0){
+            printf("[-]Error in receiving data.\n");
+        }
+        else{
+            //printf("Server: \t%s\n", buffer);
+            cout << "Message received succesfully"<< endl; 
+            s.procesare_json();
+        }
     }
-
-    send(sock , buffer_de_scriere, strlen(buffer_de_scriere) , 0 );
-    printf("Am trimis mesaj catre server!\n");
-    verificare_citire_mesaj = read( sock , buffer_de_scriere, 1024);
-    printf("%s\n", buffer_de_scriere );
-
-	delete buffer_de_citire;
-	delete buffer_de_scriere;
+	
 }
 
 #endif
