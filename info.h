@@ -40,53 +40,6 @@ class Info {
                 in>>locatie>>data>>timp>>calendar;
                 in.close();
             }
-            else
-
-#ifndef SUNET_H
-#define SUNET_H
-#include <iostream>
-#include <fstream>
-#include <stdio.h>
-#include <stdbool.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <string.h>
-#include <typeinfo>
-#include <jsoncpp/json/json.h>
-#include <boost/lexical_cast.hpp>
-#include <sstream>
-
-#define PORT 8080
-
-using namespace std;
-
-char buffer[1024];
-
-int sock = 0;
-int verificare_citire_mesaj;
-struct sockaddr_in serv_addr;
-
-
-class Sunet{
-private:
-    bool notifications;
-    bool status_sound;
-    string sound_type;
-    int volume;
-
-    Json::Value json;
-
-public:
-
-    Sunet()
-        {
-            ifstream in("SunetInput.txt");
-            if(in.is_open())
-            {
-                in>>notifications>>status_sound>>volume>>sound_type;
-                in.close();
-            }
             else cout<<"Eroare la deschiderea fisierului de intrare"<<endl;
         }
 	void stringToJson() {
@@ -95,7 +48,7 @@ public:
 		string temp = string(buffer);
 		cout << buffer<<endl;
 
-		bool parsingSuccessful = reader.parse( temp.c_str(), json);
+		bool parsingSuccessful = reader.parse(temp.c_str(), json);
 
 		if ( !parsingSuccessful )
 		{
@@ -136,12 +89,10 @@ public:
 		    {
 			location = true;
 		    }
-
 		    else
 		    {
 			location = false;
 		    }
-
 		}
         }
         string get_data() {
@@ -154,12 +105,10 @@ public:
 		    {
 			date = true;
 		    }
-
 		    else
 		    {
 			date = false;
 		    }
-
 		}
         }
         string get_timp() {
@@ -172,12 +121,10 @@ public:
 		    {
 			time = true;
 		    }
-
 		    else
 		    {
 			time = false;
 		    }
-
 		}
         }
         string get_calendar() {
@@ -190,12 +137,10 @@ public:
 		    {
 			calendar = true;
 		    }
-
 		    else
 		    {
 			calendar = false;
 		    }
-
 		}
         }
 };
