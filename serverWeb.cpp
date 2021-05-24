@@ -12,12 +12,32 @@
 #include <iostream>
 #include <fstream>
 #include <jsoncpp/json/json.h>
+#include <list>
 
+
+//g++ -o server serverWeb.cpp -lpistache -ljsoncpp
 
 #include <signal.h>
 
 using namespace std;
 using namespace Pistache;
+
+ 
+void print(std::list<std::string> const &list, int iterator)
+{
+    
+    for (auto const &i: list) {
+      
+             std::cout << iterator << std::endl;
+
+       
+    }
+}
+
+
+string listOfOuput [] = {"all_info","all_env","temperature","humidity","location"};
+
+std::list<string> outputList (listOfOuput,listOfOuput + sizeof(listOfOuput)/sizeof(string));
 
 void printCookies(const Http::Request& req) {
     auto cookies = req.cookies();
@@ -44,115 +64,171 @@ void printCookies(const Http::Request& req) {
 class SmartLampEndpoint
 {
 	Json::Value json;
+
 	Json::FastWriter fastWriter;
+
 	std::string output;
-
-private:
-
-   	std::shared_ptr<Http::Endpoint> httpEndpoint;
-    	Rest::Router router;
-
-
-	void getCommand(const Rest::Request& request, Http::ResponseWriter response)
-	{
-		std::string returnString = "No Command available!";
-		auto commandString = request.param(":commandName").as<std::string>();
-		int commandInt = stoi(commandString);
-
-		
-		if (commandInt >= 1 && commandInt <= 5) 
-		{   
-			output = fastWriter.write(json["input-buffers"][commandString]);
-			cout<<"Am trimis comanda "<<json["input-buffers"][commandString]["name"];
-			response.send(Http::Code::Ok, output);
-			
-		}
-   
-	
-	}
-
-
-      	void setupRoutes() {
-		using namespace Rest;
-		// Defining various endpoints
-		// Generally say that when http://localhost:9080/ready is called, the handleReady function should be called. 
-		Routes::Get(router, "/ready", Routes::bind(&Generic::handleReady));
-		Routes::Get(router, "/auth", Routes::bind(&SmartLampEndpoint::doAuth, this));
-		Routes::Get(router,"/command/:commandName", Routes::bind(&SmartLampEndpoint::getCommand,this));
-		// Routes::Post(router, "/settings/:settingName/:value", Routes::bind(&MicrowaveEndpoint::setSetting, this));
-		//Routes::Get(router, "/settings/:settingName/", Routes::bind(&MicrowaveEndpoint::getSetting, this));
-        }
-
-
-	void doAuth(const Rest::Request& request, Http::ResponseWriter response) {
-		// Function that prints cookies
-		printCookies(request);
-		// In the response object, it adds a cookie regarding the communications language.
-		response.cookies()
-		    .add(Http::Cookie("lang", "en-US"));
-		// Send the response
-		response.send(Http::Code::Ok);
-	}
 	
 public:
 
 	explicit SmartLampEndpoint(Address addr)
         : httpEndpoint(std::make_shared<Http::Endpoint>(addr))
-    	{ 
-    		ifstream commandFile("commands.json");
-		commandFile >> json;
-    	}
+    { 
+    	ifstream commandFile("commands.json");
+		commandFile>>json;
+	  
 
-    	 void init() {
-        	auto opts = Http::Endpoint::options();
-        	httpEndpoint->init(opts);
-		 
-        	// Server routes are loaded up
-       		 setupRoutes();
-    	}
+    }
 
-    	 void start() {
-        	httpEndpoint->setHandler(router.handler());
-        	httpEndpoint->serveThreaded();
-   	}
+     void init() {
+        auto opts = Http::Endpoint::options();
+        httpEndpoint->init(opts);
+        // Server routes are loaded up
+        setupRoutes();
+    }
 
-   	 // When signaled server shuts down
-   	 void stop(){
-        	httpEndpoint->shutdown();
-   	}
+     void start() {
+        httpEndpoint->setHandler(router.handler());
+        httpEndpoint->serveThreaded();
+    }
+
+    // When signaled server shuts down
+    void stop(){
+        httpEndpoint->shutdown();
+    }
+
+  private:
+
+   	std::shared_ptr<Http::Endpoint> httpEndpoint;
+    Rest::Router router;
+
+
+	void getCommand(const Rest::Request& request, Http::ResponseWriter response)
+	{
+
+		std::string returnString = "No Command available!";
+		auto commandString = request.param(":commandName").as<std::string>();
+		int commandInt = stoi(commandString);
+
+	
+		if (commandInt >= 1 && commandInt <= 5) 
+		{   
+			//cout<<"AAA "<<json["input-buffers"]["1"] << endl;
+			output = fastWriter.write(json["input-buffers"][commandString]);
+			cout<<"Am trimis comanda "<<json["input-buffers"][commandString]["name"] << endl;
+			response.send(Http::Code::Ok, output);
+			
+			//cout<<output;
+		}
+	
+	}
+     
+     void setCommand(const Rest::Request& request, Http::ResponseWriter response)
+     {
+
+        string returnString= request.param(":commandOutput").as<std::string>(); 
+
+        bool found = (std::find(outputList.begin(), outputList.end(), returnString) != outputList.end());
+        
+        //string message = (found) ? returnString : "No Command available!";
+
+
+        string message = "{request: temperature}";
+
+        cout << " Return string: " << returnString << endl;
+
+        cout << message << endl;
+
+
+        response.send(Http::Code::Ok, message);
+
+
+        // afiseaza elementul de pe poz 4
+
+        // auto l_front = outputList.begin();
+
+        // std::advance(l_front, 4);
+
+        // std::cout << *l_front << '\n';
+
+        // print(outputList);
+
+     
+
+
+     }
+
+      void setupRoutes() {
+        using namespace Rest;
+        // Defining various endpoints
+        // Generally say that when http://localhost:9080/ready is called, the handleReady function should be called. 
+        Routes::Get(router, "/ready", Routes::bind(&Generic::handleReady));
+        Routes::Get(router, "/auth", Routes::bind(&SmartLampEndpoint::doAuth, this));
+        Routes::Get(router,"/command/:commandName", Routes::bind(&SmartLampEndpoint::getCommand,this));
+        Routes::Get(router,"/request/:commandOutput",Routes::bind(&SmartLampEndpoint::setCommand,this));
+       // Routes::Post(router, "/settings/:settingName/:value", Routes::bind(&MicrowaveEndpoint::setSetting, this));
+        //Routes::Get(router, "/settings/:settingName/", Routes::bind(&MicrowaveEndpoint::getSetting, this));
+    }
+
+
+    void doAuth(const Rest::Request& request, Http::ResponseWriter response) {
+        // Function that prints cookies
+        printCookies(request);
+        // In the response object, it adds a cookie regarding the communications language.
+        response.cookies()
+            .add(Http::Cookie("lang", "en-US"));
+        // Send the response
+        response.send(Http::Code::Ok);
+    }
+
 
 };
 
 
+
+
+
 int main(int argc, char *argv[])
 {
- sigset_t signals;
- Port port(8080);
- Address addr(Ipv4::any(), port);
- SmartLampEndpoint stats(addr);
+	 sigset_t signals;
 
- SmartLamp smL;
-
- stats.init();
- stats.start();
-
- //cout<<"Heeelllooo!"<<endl;
+	   Port port(8081);
 
 
- int signal = 0;
- int status = sigwait(&signals, &signal);
- if (status == 0)
- {
-	std::cout << "received signal " << signal << std::endl;
- }
- else
- {
-	std::cerr << "sigwait returns " << status << std::endl;
- }
 
-cout << "server waiting for client command" << endl;
+	   Address addr(Ipv4::any(), port);
 
-//stats.
+	   SmartLampEndpoint stats(addr);
+
+
+
+
+
+	   //int thr = 2;
+
+	   stats.init();
+	   stats.start();
+
+
+	   //cout<<"Heeelllooo!"<<endl;
+
+
+	
+	int signal = 0;
+    int status = sigwait(&signals, &signal);
+    if (status == 0)
+    {
+        std::cout << "received signal " << signal << std::endl;
+    }
+    else
+    {
+        std::cerr << "sigwait returns " << status << std::endl;
+    }
+  
+
+    cout<<"server waiting for client command"<<endl;
+
+    //stats.
 
 
 }
