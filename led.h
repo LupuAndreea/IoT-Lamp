@@ -13,11 +13,18 @@
 #include <boost/lexical_cast.hpp>
 #include <sstream>
 
-#define PORT 8081
+#define PORT 8080
 
 using namespace std;
 
 
+//multi-line comment ctr+/ 
+char buffer[1024];
+
+int sock = 0;
+int verificare_citire_mesaj;
+struct sockaddr_in serv_addr;
+Json::Reader reader;
 
 class Led{
 private:
@@ -26,6 +33,8 @@ private:
     string culoare;
     int timer;
     bool status_timer;
+
+    Json::Value json;
 public:
     Led()
         {
@@ -39,93 +48,120 @@ public:
         }
 
 
-    void preluare_date_json(Json::Value json)
+    void stringToJson()
+    {
+
+        //string res1 = to_string(res);
+        Json::Reader reader;
+        string temp = string(buffer);
+        cout << buffer<<endl;
+
+        bool parsingSuccessful = reader.parse( temp.c_str(), json);
+
+        if ( !parsingSuccessful )
+        {
+
+            cout << "Error parsing the string" << endl;
+        }
+            
+        json = json["led"];
+        cout << json;
+    }
+
+    void procesare_json()
     {
         
-        cout << "Nu contez" << endl;
-      // cout << json["stat"];
+        this->stringToJson();
+        this->set_status();
+        this->set_intensitate();
+        this->set_culoare();
+        this->set_timer();
+        this->set_status_timer();
 
     }
     void scriere_fisier()
         {
-            ofstream out("SunetOutput.txt");
+            ofstream out("ledOutput.txt");
             if(out.is_open())
             {
-                out<<" "<<status<<" "<<intensitate<<" "<<culoare<<" "<<timer<<" "<<status_timer;
+                out << "Led status: " << status << endl;
+                out << "Intensity " << intensitate << endl;
+                out << "Color :  " << culoare << endl;
+                out << "Time" << timer << endl;
+                out << "Status timer: " << status_timer;
                 out.close();
             }
             else cout<<"Eroare la deschiderea fisierului de iesire";
         }
 
-    void set_status(Json::Value json)
+    void set_status()
     {
+        if(json["status_led"] != "null"){
+             if (json["status_led"] == true)
+             { 
+                status = true;
+             }
 
-         if (json["status_led"] == true)
-         { 
-            status = true;
+             else 
+             {  
+                status = false;
+             }
+
          }
-
-         else 
-         {  
-            status = false;
-         }
-
-         cout << "status: "<< status;
 
     }
 
-    void set_intensitate(Json::Value json)
+    void set_intensitate()
     {
         Json::FastWriter fastWriter;
+        if(json["intensity"] != "null"){
         std::string string_intensitate = fastWriter.write(json["intensity"]);
 
         stringstream geek(string_intensitate);
 
         geek >> intensitate;
+        }
 
-       // cout << "Value of string_intensitate: " << string_intensitate;
-
-       // cout << "Value of intensitate: " << intensitate; 
     }
 
 
-    void set_culoare(Json::Value json)
+    void set_culoare()
     {
+        if(json["color"] != "null"){
           
-        Json::FastWriter fastWriter;
-        culoare = fastWriter.write(json["color"]);
-
-       // cout << "Color: " << culoare;
+            Json::FastWriter fastWriter;
+            culoare = fastWriter.write(json["color"]);
+        }
 
     }
 
-    void set_timer (Json::Value json)
+    void set_timer ()
     {
          
         Json::FastWriter fastWriter;
-        std::string string_timer = fastWriter.write(json["timer"]);
+        if(json["timer"] != "null"){
+            std::string string_timer = fastWriter.write(json["timer"]);
 
-        stringstream geek(string_timer);
+            stringstream geek(string_timer);
 
-        geek >> timer;
-
-       // cout << "Value of timer: " << timer; 
+            geek >> timer;
+        }
 
     }
 
-    void set_status_timer(Json::Value json)
+    void set_status_timer()
     {
-         if (json["status_timer"] == true)
-         { 
-            status_timer = true;
-         }
+        if(json["status_timer"] != "null"){
+             if (json["status_timer"] == true)
+             { 
+                status_timer = true;
+             }
 
-         else 
-         {  
-            status_timer = false;
-         }
-
-        // cout << "status_timer: "<< status_timer;
+             else 
+             {  
+                status_timer = false;
+             }
+        }
     }
 
     bool get_status()
@@ -150,50 +186,54 @@ public:
     }
 };
 
-int sock = 0;
-int verificare_citire_mesaj;
-struct sockaddr_in serv_addr;
-
-char * buffer_de_citire = NULL;
-char * buffer_de_scriere = NULL;
-
 int conectare_la_server(){
 
-	buffer_de_scriere = new char[1024];
-	strcpy(buffer_de_scriere ,"Hello from client!");
+    int clientSocket, ret;
+    struct sockaddr_in serverAddr;
+    Led l;
+    
 
-	buffer_de_citire = new char [1024];
-
-	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        printf("\n Socket creation error \n");
-        return -1;
+    clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if(clientSocket < 0){
+        printf("[-]Error in connection.\n");
+        exit(1);
     }
+    printf("[+]Client Socket is created.\n");
 
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
+    memset(&serverAddr, '\0', sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(PORT);
+    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    // Convert IPv4 and IPv6 addresses from text to binary form
-    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)
-    {
-        printf("\nInvalid address/ Address not supported \n");
-        return -1;
+    ret = connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+    if(ret < 0){
+        printf("[-]Error in connection.\n");
+        exit(1);
     }
+    printf("[+]Connected to Server.\n");
 
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-    {
-        printf("\nConnection Failed \n");
-        return -1;
+    while(1){
+        printf("Client: \t");
+        scanf("%s", &buffer[0]);
+        send(clientSocket, buffer, strlen(buffer), 0);
+
+        if(strcmp(buffer, ":exit") == 0){
+            close(clientSocket);
+            printf("[-]Disconnected from server.\n");
+            exit(1);
+        }
+
+        if(recv(clientSocket, buffer, 1024, 0) < 0){
+            printf("[-]Error in receiving data.\n");
+        }
+        else{
+            //printf("Server: \t%s\n", buffer);
+            cout << "Message received succesfully"<< endl; 
+            l.procesare_json();
+        }
     }
-
-    send(sock , buffer_de_scriere, strlen(buffer_de_scriere) , 0 );
-    printf("Am trimis mesaj catre server!\n");
-    verificare_citire_mesaj = read( sock , buffer_de_scriere, 1024);
-    printf("%s\n", buffer_de_scriere );
-
-	delete buffer_de_citire;
-	delete buffer_de_scriere;
 }
+
 
 
 #endif

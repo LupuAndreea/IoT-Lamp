@@ -17,12 +17,21 @@
 
 using namespace std;
 
+char buffer[1024];
+
+int sock = 0;
+int verificare_citire_mesaj;
+struct sockaddr_in serv_addr;
+
+
 class Sunet{
 private:
     bool notifications;
     bool status_sound;
     string sound_type;
     int volume;
+
+    Json::Value json;
 
 public:
 
@@ -31,18 +40,40 @@ public:
             ifstream in("SunetInput.txt");
             if(in.is_open())
             {
-                in>>status>>volum>>tip;
+                in>>notifications>>status_sound>>volume>>sound_type;
                 in.close();
             }
             else cout<<"Eroare la deschiderea fisierului de intrare"<<endl;
         }
 
-    void preluare_date_json(Json::Value json)
+    void stringToJson()
     {
 
-        cout << "Nu contez" << endl;
-      // cout << json["stat"];
+        //string res1 = to_string(res);
+        Json::Reader reader;
+        string temp = string(buffer);
+        cout << buffer<<endl;
 
+        bool parsingSuccessful = reader.parse( temp.c_str(), json);
+
+        if ( !parsingSuccessful )
+        {
+
+            cout << "Error parsing the string" << endl;
+        }
+            
+        json = json["sound"];
+        cout << json;
+    }
+
+    void procesare_json(){
+
+        this->stringToJson();
+        this->set_notifications();
+        this->set_status();
+        this->set_soundType();
+        this->set_volume();
+        this->scriere_fisier();
     }
 
     void scriere_fisier()
@@ -50,15 +81,18 @@ public:
             ofstream out("SunetOutput.txt");
             if(out.is_open())
             {
-                out<<" "<<status<<" "<<volum<<" "<<tip;
+                out << "Notification: " <<  notifications << endl;
+                out << "Status sound: " << status_sound << endl;
+                out << "Volum " << volume << endl;
+                out << "Sount Type" << sound_type << endl;
                 out.close();
             }
             else cout<<"Eroare la deschiderea fisierului de iesire";
         }
 
-    void set_notifications(Json::Value json)
+    void set_notifications()
     {
-        if(json["notifications"] != null)
+        if(json["notifications"] != "null")
         {
             if (json["notifications"] == true)
             {
@@ -70,13 +104,12 @@ public:
                 notifications = false;
             }
 
-            cout << "Notifications: "<< notifications;
         }
     }
 
-    void set_status(Json::Value json)
+    void set_status()
     {
-        if(json["status_sound"] != null)
+        if(json["status_sound"] != "null" )
         {
             if (json["status_sound"] == true)
             {
@@ -88,23 +121,21 @@ public:
                 status_sound = false;
             }
 
-            cout << "Status_sound: "<< status_sound;
         }
     }
 
-    void set_soundType(Json::Value json)
+    void set_soundType()
     {
-        if(json["sound_type"] != null)
+        if(json["sound_type"] != "null")
         {
             Json::FastWriter fastWriter;
             sound_type = fastWriter.write(json["sound_type"]);
-             // cout << "Sound type: " << sound_type;
         }
     }
 
-    void set_volume(Json::Value json)
+    void set_volume()
     {
-        if(json["volume"] != null)
+        if(json["volume"] != "null" )
         {
             Json::FastWriter fastWriter;
             string volume = fastWriter.write(json["volume"]);
@@ -113,7 +144,6 @@ public:
 
             geek >> volume;
 
-            // cout << "Volume: " << volume;
         }
     }
 
@@ -139,49 +169,55 @@ public:
 
 };
 
-int sock = 0;
-int verificare_citire_mesaj;
-struct sockaddr_in serv_addr;
 
-char * buffer_de_citire = NULL;
-char * buffer_de_scriere = NULL;
 
 int conectare_la_server(){
 
-	buffer_de_scriere = new char[(sizeof"Hello from client!")];
-	strcpy(buffer_de_scriere ,"Hello from client!");
+    int clientSocket, ret;
+    struct sockaddr_in serverAddr;
+    Sunet s;
+    
 
-	buffer_de_citire = new char [1024];
-
-	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        printf("\n Socket creation error \n");
-        return -1;
+    clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if(clientSocket < 0){
+        printf("[-]Error in connection.\n");
+        exit(1);
     }
+    printf("[+]Client Socket is created.\n");
 
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
+    memset(&serverAddr, '\0', sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(PORT);
+    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    // Convert IPv4 and IPv6 addresses from text to binary form
-    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)
-    {
-        printf("\nInvalid address/ Address not supported \n");
-        return -1;
+    ret = connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+    if(ret < 0){
+        printf("[-]Error in connection.\n");
+        exit(1);
     }
+    printf("[+]Connected to Server.\n");
 
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-    {
-        printf("\nConnection Failed \n");
-        return -1;
+    while(1){
+        printf("Client: \t");
+        scanf("%s", &buffer[0]);
+        send(clientSocket, buffer, strlen(buffer), 0);
+
+        if(strcmp(buffer, ":exit") == 0){
+            close(clientSocket);
+            printf("[-]Disconnected from server.\n");
+            exit(1);
+        }
+
+        if(recv(clientSocket, buffer, 1024, 0) < 0){
+            printf("[-]Error in receiving data.\n");
+        }
+        else{
+            //printf("Server: \t%s\n", buffer);
+            cout << "Message received succesfully"<< endl; 
+            s.procesare_json();
+        }
     }
-
-    send(sock , buffer_de_scriere, strlen(buffer_de_scriere) , 0 );
-    printf("Am trimis mesaj catre server!\n");
-    verificare_citire_mesaj = read( sock , buffer_de_scriere, 1024);
-    printf("%s\n", buffer_de_scriere );
-
-	delete buffer_de_citire;
-	delete buffer_de_scriere;
 }
+
 
 #endif

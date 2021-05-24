@@ -1,15 +1,13 @@
 #include "led.h"
 
+//g++ -o led led.cpp
+//g++ -o led led.cpp -ljsoncpp 
+
 
 int main()
 {
-    Led l;
-    l.scriere_fisier();
-    //citire_fisier();
-
-
-    /*cout<<status<<"  "<<volum<<" "<<tip<<endl;
-    cout<<typeid(status).name();*/
+    
     conectare_la_server();
+
     return 0;
 }
