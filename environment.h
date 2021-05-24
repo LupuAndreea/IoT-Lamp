@@ -26,10 +26,6 @@ int verificare_citire_mesaj;
 struct sockaddr_in serv_addr;
 Json::Reader reader;
 
-/*
-char * buffer_de_citire = NULL;
-char * buffer_de_scriere = NULL;
-char * buffer_json = NULL;*/
 
 class EnvironmentInformation {
 
@@ -52,22 +48,12 @@ public:
 
     }
 
-    /*
-    void data_to_json()
-    {
-        json["humidity"] = humidity;
-        json["temperature"] = temperature;
-        json["status_olfactive"] = status_olfactive;
-        json["status_pollution"] = status_pollution;
 
-       // cout << json;
-
-    }*/
 
     void stringToJson()
     {
 
-        //string res1 = to_string(res);
+
         Json::Reader reader;
         string temp = string(buffer);
         cout << buffer<<endl;
@@ -180,21 +166,6 @@ public:
         return status_pollution;
     }
 
-   /* void jsonToChar()
-    {
-
-
-        string aux;
-        aux = fastWriter.write(json);
-
-        buffer_json = new char[aux.length()];
-        strcpy(buffer_json,aux.c_str());
-        cout << "Datele pentru mediu: " << buffer_json;
-    }
-
-
-
-};*/
 
 int conectare_la_server(){
 
@@ -237,7 +208,7 @@ int conectare_la_server(){
             printf("[-]Error in receiving data.\n");
         }
         else{
-            //printf("Server: \t%s\n", buffer);
+
             cout << "Message received succesfully"<< endl;
             env.procesare_json();
         }
