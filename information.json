@@ -1,0 +1,73 @@
+{
+	"device-name": "Smart Lamp",
+    "device-type": "Lamp",
+    "buffers-count": 2,
+    "output-buffers":{
+        "protocol": "HTTP",
+        "prefix": "curl -XPOST 'http://127.0.0.1:8080/'",
+            
+
+    	"1":{
+
+    		"name":"Information command",
+            
+               "led": {
+
+                    "status_led" : false
+
+                      },
+    		
+    	 "sound": {
+
+                     "notifications" : true
+
+                     },
+
+              "movement":{
+
+                    "movement_status": "off"
+                         },
+           	
+	"information":{
+	       "location": "on",
+	       "date": "on",
+	       "time": "on",
+	       "calendar": "on"
+
+           },
+	
+
+
+        "2":{
+            "name": "Environment command",
+
+            "led":{
+
+                "status_led" : false
+            },
+
+
+            "sound": {
+                "notifications" : true
+            },
+
+            "movement":{
+                "movement_status": "off"
+            },
+
+	"information":{
+          	    "location": "on",
+	       "date": "on",
+	       "time": "on",
+	       "calendar": "off",
+	       "humidity": "on",
+	       "temperature": "on",
+	       "status_olfactive": "on",
+	       "status_pollution": "on"
+	}
+          
+        }
+
+    }
+
+}
