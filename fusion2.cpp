@@ -46,7 +46,7 @@ char * buffer_de_scriere = NULL;
 char * buffer_json = NULL;
 static string  readBuffer;
 static char * temporar;
-string chestie = "eu sunt temporar";
+
 
 string listOfOuput [] = {"all_info","all_env","temperature","humidity","location"};
 
@@ -231,8 +231,7 @@ int main() {
         // readBuffer = shmat(readBufferid, 0, 0);
 
         cout << "This child process" << endl;
-        cout << chestie << endl;
-        chestie = chestie + "mesaj";
+      
         start_server();
     }
     else
@@ -241,7 +240,7 @@ int main() {
         // readBuffer = shmat(readBufferid, 0, 0);
 
         cout << "This is parent process" << endl;
-        cout << chestie << endl;
+     
 
         communicationWithHttp();
     }
