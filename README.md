@@ -36,7 +36,7 @@ Raportul de analiză se găsește [aici](https://github.com/LupuAndreea/IoTLamp/
  1. ***JSON***
    -  Se rulează în terminal comanda sudo `apt-get install libjsoncpp-dev`. Numeroase detalii despre JSON se  găsesc aici: [JSON](https://www.json.org/json-en.html)
 
- 3. ***Pistache***
+ 2. ***Pistache***
    -  Pentru a instala Pistache pe Ubuntu, am introdus în terminal comenzile 
   
       * `sudo add-apt-repository ppa:pistache+team/unstable`
@@ -46,11 +46,11 @@ Raportul de analiză se găsește [aici](https://github.com/LupuAndreea/IoTLamp/
       Mai multe informaţii despre instalarea Pistache se găsesc aici: [pistacheio/pistache: A high-performance REST Toolkit written in C++ (github.com)](https://github.com/pistacheio/pistache)
 
 
- 4. ***Curl***
+ 3. ***Curl***
    - Prin prisma faptului că librăria `curl` este disponibilă în Ubuntu 20.04, primul pas către instalare este rularea comenzii sudo apt update, urmată de `sudo apt install curl`.
      Despre curl, dar şi o trimitere către o carte dedicată acestui subiect găsim aici: [curl](https://curl.se/).
 
- 5. ***#include <boost/lexical_cast.hpp>***
+ 4. ***#include <boost/lexical_cast.hpp>***
     Se rulează în terminal comanda `sudo apt-get install libboost-all-dev`.
     
  ## **Paşi de rulare**
