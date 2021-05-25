@@ -1,20 +1,66 @@
-# IoT-Lamp
-The main of this project is to create a smart lamp capable of monetarizing the temperature, humidity and noise pollution in the room. At the same time it comes with a number of moods so that it can adapt for studding, parting and even relaxing. It can even wake you up in the morning if you are to lazy.  
+# SmartLamp
 
-# User Stories
+Raportul de analiză se găsește [aici](https://github.com/LupuAndreea/IoTLamp/blob/main/Raport_Final_Smart_Lamp.pdf)
 
-1. Ca utilizator vreau ca lampa sa porneasca intr-un mod standrard.
-2. Sreau ca atunci cand lucrez sa activez modul de study, luminozitatea sa fie maxima si sa pot seta un tip anume de muzica.
-3. Ca utilizator vreau ca atunci când accesez study mode sa mi se blocheze accesul la alte aplicații(sa nu mai primesc notificari de la Facebook, Instagram, Whatsapp)
-4. Doersc sa am acces la un party mode ce porneste prin comanda vocala
-5. Party modeul se diferentiaza de celelalte prin scimbarea culorii luminii si prin schimbarea intansitatii.
-6. Ca utilizator vreau sa am acces la un feature de setare a alarmei pentru momentele in care nu sunt acasa.
-7. Doresc sa am acces la informatii cu privire la locatia mea curenta, ora si data ce vor fi afisate in interfata.
-8. Ca utilizator vreau sa primesc notificari de la aplicatii precum Facebook, Instagram, Whatsapp. Acestea sunt anuntate prin schimbarea culorii lampii
-9. Doresc sa am acces la elemente de mediu precum temperatura, luminozitate, umiditate.
-10. Doresc ca interfata sa aibe un design user friendly.
+## **Cerințe de sistem**
 
-# Trello 
 
-https://trello.com/b/TnOty7z8/to-do-list
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**În scopul realizării proiectului am folosit numeroase librării. Dintre acestea, [Jsoncpp ](https://github.com/open-source-parsers/jsoncpp), [Pistache](https://github.com/pistacheio/pistache) şi [Curl](https://curl.se/) au trebuit să fie instalate. Datorită faptului că _Pistache_ nu suportă _Windows_, sistemul de operare utilizat este `Ubuntu`.** :smirk:
+  
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **De asemenea, este necesar un compilator C++, iar noi am ales `g++`.**
+ 
+ ## **Librării**
+ 
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Pe parcursul creării proiectului am folosit librăriile standard pentru citire, scriere, librării pentru manipularea şirurilor de caractere sau lucrul cu variabile de tip bool şi multe altele. Dintre aceste se diferenţiază cele pe care a trebuit să le instalăm:
 
+  1. **#include <jsoncpp/json/json.h>** face posibilă manipularea valorilor `JSON` de care am avut nevoie în vederea transmiterii datelor
+  2. **Pistache** este utilizat pentru:
+     - crearea unui `server HTTP` cu mai multe fire de execuţie destinat creării, definirii şi solicitării `API-urilor`
+     - a trimite cereri către funcţiile C++ printr-un `router HTTP`
+
+     În cadrul proiectului am folosit următoarele: 
+       * #include <pistache/net.h>
+       * #include <pistache/http.h>
+       * #include <pistache/peer.h>
+       * #include <pistache/http_headers.h>
+       * #include <pistache/cookie.h>
+       * #include <pistache/router.h>
+       * #include <pistache/endpoint.h>
+       * #include <pistache/common.h>
+   
+  3. **#include <curl/curl.h>** ajută la transferarea datelor de la server sau către server, utilizând protocoalele `HTTP` şi `MQTT`
+  4. **#include <boost/lexical_cast.hpp>** face posibilă conversia din valori numerice în şiruri de caractere şi invers
+
+ 
+ ## **Paşi de instalare**
+ 1. ***JSON***
+   -  Se rulează în terminal comanda sudo `apt-get install libjsoncpp-dev`. Numeroase detalii despre JSON se  găsesc aici: [JSON](https://www.json.org/json-en.html)
+
+ 3. ***Pistache***
+   -  Pentru a instala Pistache pe Ubuntu, am introdus în terminal comenzile 
+  
+      * `sudo add-apt-repository ppa:pistache+team/unstable`
+      * `sudo apt update`
+      * `sudo apt install libpistache-dev`
+      
+      Mai multe informaţii despre instalarea Pistache se găsesc aici: [pistacheio/pistache: A high-performance REST Toolkit written in C++ (github.com)](https://github.com/pistacheio/pistache)
+
+
+ 4. ***Curl***
+   - Prin prisma faptului că librăria `curl` este disponibilă în Ubuntu 20.04, primul pas către instalare este rularea comenzii sudo apt update, urmată de `sudo apt install curl`.
+     Despre curl, dar şi o trimitere către o carte dedicată acestui subiect găsim aici: [curl](https://curl.se/).
+
+ 5. ***#include <boost/lexical_cast.hpp>***
+    Se rulează în terminal comanda `sudo apt-get install libboost-all-dev`.
+    
+ ## **Paşi de rulare**
+ 
+  1. ***JSON***
+     Se rulează în terminal numele fişierului urmat de compiler flag  `g++ -o server serverWeb.cpp –ljsoncpp`.
+  Apoi, în terminal este rulată comanda `./server`.
+  
+  2. ***Pistache***
+     În cadrul proiectului nostru, pentru am utilizat Pistache în comenzi scrise în terminal, precum: `g++ -o led led.cpp -ljsoncpp`.
+     
+  3. ***Curl***
+        Pentru a rula curl, se utilizează o comandă de tipul curl urmat de url-ul dorit. Spre exemplu, curl    `http://localhost:8080/command/1`.
