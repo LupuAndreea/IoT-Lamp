@@ -1,6 +1,6 @@
 # SmartLamp
 
-Raportul de analiză se găsește [aici](https://github.com/LupuAndreea/IoTLamp/blob/main/Raport_Final_Smart_Lamp.pdf)
+Raportul de analiză se găsește [aici](https://github.com/LupuAndreea/IoT-Lamp/blob/main/Raport_Final_Smart_Lamp.pdf)
 
 ## **Cerințe de sistem**
 
