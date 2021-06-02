@@ -1,3 +1,6 @@
+#ifndef FUSION_H
+#define FUSION_H
+
 #include <iostream>
 #include <unistd.h>
 #include <stdio.h>
@@ -14,6 +17,7 @@
 #include <list>
 #include <sys/shm.h>
 #include <sys/mman.h>
+#include <typeinfo>
 #define SHMSIZE 27
 
 //g++ -o fusion fusion.cpp -ljsoncpp -lcurl
@@ -63,9 +67,6 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 class UrlCommunication
 {
     Json::Value json;
-    //std::string errors;
-  //  CURLcode res;
-    //CURLcode error;
     Json::FastWriter fastWriter;
     CURLcode res;
  
@@ -75,17 +76,23 @@ public:
 
 	
 
-        void communicationWithServer(char command[])
+        void communicationWithServer(char command)
         {
 
 		  CURL *curl;  
+          char b = '1';
+          if (typeid(command).name() == typeid(b).name())
+          cout << "Comanda este de ip char" << endl;
 
 		  curl = curl_easy_init();
-		  char mesaj[] = "http://localhost:8081/command/1";
+   		  char mesaj[] = "http://localhost:8081/command/";
 
-		 // char comanda[] = "2";
+            
+          int len = strlen(mesaj);
+          mesaj[len] = command;
+          mesaj[len+1] = '\0';
 
-		  //strcat(mesaj,command);
+            
 
 		  if(curl) 
 		  {
@@ -95,10 +102,10 @@ public:
 		    res = curl_easy_perform(curl);
 		    curl_easy_cleanup(curl);
 
-		    //std::cout << "Face ceva "<< readBuffer << std::endl;
 		   }
 
             bzero(temporar, sizeof(temporar));
+            cout << "Sunt in fusion" << endl;
 
             strcpy(temporar,readBuffer.c_str());
 
@@ -110,8 +117,6 @@ public:
 
         string aux;
         aux = fastWriter.write(json[modul]);
-       // cout << aux;
-
         buffer_json = new char[aux.length()];
         strcpy(buffer_json,aux.c_str());
         cout << "Datele pentru led: " << buffer_json;
@@ -180,10 +185,7 @@ int start_server(){
                     printf("Client: %s\n", buffer);
                    
 
-                    // cout << "Aici readbuffer" << readBuffer << endl;
-                    // cout << "Ar trebui sa apara pe client: " << buffer_json << endl;
                     send(newSocket, temporar, strlen(temporar), 0);
-                   // bzero(temporar, sizeof(temporar));
                 }
             }
         }
@@ -197,7 +199,7 @@ int start_server(){
 
 void communicationWithHttp(){
 
-    string stringCommand;
+    char stringCommand;
 
     UrlCommunication url; 
 
@@ -206,49 +208,10 @@ void communicationWithHttp(){
         cout << "Insert command: " ;
         cin >> stringCommand;
         bzero(temporar, sizeof(temporar));
-        url.communicationWithServer("1");
-        //url.stringToJson();
-        //url.jsonToChar("led");
+        url.communicationWithServer(stringCommand);
     }
   
 
 }
 
-
-int main() {
-
-    int readBufferid;
-
-
-    temporar = (char *)mmap(NULL, sizeof *temporar, PROT_READ | PROT_WRITE, 
-                    MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-
-	
-
-    if (fork() == 0)
-    {   
-        // readBufferid = shmget(2009, SHMSIZE, 0);
-        // readBuffer = shmat(readBufferid, 0, 0);
-
-        cout << "This child process" << endl;
-      
-        start_server();
-    }
-    else
-    {
-        // readBufferid = shmget(2009, SHMSIZE, 0666 | IPC_CREAT);
-        // readBuffer = shmat(readBufferid, 0, 0);
-
-        cout << "This is parent process" << endl;
-     
-
-        communicationWithHttp();
-    }
-    
-	
-
-	return 0;
-   
-       
-    
-} 
+#endif

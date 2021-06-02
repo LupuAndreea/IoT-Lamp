@@ -1,3 +1,6 @@
+#ifndef SERVERWEB_H
+#define SERVERWEB_H
+
 
 #include <algorithm>
 
@@ -61,13 +64,17 @@ void printCookies(const Http::Request& req) {
 
 }
 
+Json::Value json;
+
 class SmartLampEndpoint
 {
-	Json::Value json;
+	
 
 	Json::FastWriter fastWriter;
 
-	std::string output;
+	string chestie = "eu sunt temporar";
+    
+    std::string output;
 	
 public:
 
@@ -113,12 +120,9 @@ public:
 	
 		if (commandInt >= 1 && commandInt <= 5) 
 		{   
-			//cout<<"AAA "<<json["input-buffers"]["1"] << endl;
 			output = fastWriter.write(json["input-buffers"][commandString]);
 			cout<<"Am trimis comanda "<<json["input-buffers"][commandString]["name"] << endl;
 			response.send(Http::Code::Ok, output);
-			
-			//cout<<output;
 		}
 	
 	}
@@ -139,21 +143,7 @@ public:
 
         cout << message << endl;
 
-
         response.send(Http::Code::Ok, message);
-
-
-        // afiseaza elementul de pe poz 4
-
-        // auto l_front = outputList.begin();
-
-        // std::advance(l_front, 4);
-
-        // std::cout << *l_front << '\n';
-
-        // print(outputList);
-
-     
 
 
      }
@@ -186,49 +176,4 @@ public:
 
 
 
-
-
-int main(int argc, char *argv[])
-{
-	 sigset_t signals;
-
-	   Port port(8081);
-
-
-
-	   Address addr(Ipv4::any(), port);
-
-	   SmartLampEndpoint stats(addr);
-
-
-
-
-
-	   //int thr = 2;
-
-	   stats.init();
-	   stats.start();
-
-
-	   //cout<<"Heeelllooo!"<<endl;
-
-
-	
-	int signal = 0;
-    int status = sigwait(&signals, &signal);
-    if (status == 0)
-    {
-        std::cout << "received signal " << signal << std::endl;
-    }
-    else
-    {
-        std::cerr << "sigwait returns " << status << std::endl;
-    }
-  
-
-    cout<<"server waiting for client command"<<endl;
-
-    //stats.
-
-
-}
+#endif

@@ -1,0 +1,5 @@
+Notification: 0
+Status sound: 1
+Volum 65535
+Sount Type"classic"
+

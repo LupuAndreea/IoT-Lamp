@@ -54,7 +54,7 @@
                 "notifications" : false,
                 "status_sound" : true,
                 "sound_type" : "classic",
-                "volume" : 20
+                "volume" : 65535
             },
 
             "movement":{

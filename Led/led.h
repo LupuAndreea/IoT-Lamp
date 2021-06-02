@@ -38,7 +38,7 @@ private:
 public:
     Led()
         {
-            ifstream in("SunetInput.txt");
+            ifstream in("LedInput.txt");
             if(in.is_open())
             {
                 in>>status>>intensitate>>culoare>>timer>>status_timer;
@@ -214,8 +214,10 @@ int conectare_la_server(){
 
     while(1){
         printf("Client: \t");
-        scanf("%s", &buffer[0]);
-        send(clientSocket, buffer, strlen(buffer), 0);
+       //scanf("%s", &buffer[0]);
+        sleep(5);
+        //buffer = ;
+        send(clientSocket,"Solicit update", strlen("Solicit update"), 0);
 
         if(strcmp(buffer, ":exit") == 0){
             close(clientSocket);

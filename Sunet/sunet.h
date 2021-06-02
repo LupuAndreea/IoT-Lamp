@@ -199,8 +199,12 @@ int conectare_la_server(){
 
     while(1){
         printf("Client: \t");
-        scanf("%s", &buffer[0]);
-        send(clientSocket, buffer, strlen(buffer), 0);
+        
+        sleep(5);
+
+        //scanf("%s", &buffer[0]);
+
+        send(clientSocket, "Solicit update", strlen("Solicit update"), 0);
 
         if(strcmp(buffer, ":exit") == 0){
             close(clientSocket);

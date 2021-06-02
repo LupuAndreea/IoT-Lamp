@@ -2,13 +2,13 @@
 #include <fstream>
 #include <stdio.h>
 #include <stdbool.h>
-#include <winsock2.h>
+#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
 #include <typeinfo>
 
-#include <wiringPi.h>
+//#include <wiringPi.h>
 
 #define PORT 8080
 
@@ -121,10 +121,28 @@ int conectare_la_server(){
         return -1;
     }
 
-    send(sock , buffer_de_scriere, strlen(buffer_de_scriere) , 0 );
-    printf("Am trimis mesaj catre server!\n");
-    verificare_citire_mesaj = read( sock , buffer_de_scriere, 1024);
-    printf("%s\n", buffer_de_scriere );
+     while(1){
+        printf("Client: \t");
+        scanf("%s", &buffer_de_scriere[0]);
+        send(sock, buffer_de_scriere, strlen(buffer_de_scriere), 0);
+
+        if(strcmp(buffer_de_scriere, ":exit") == 0){
+            close(sock);
+            printf("[-]Disconnected from server.\n");
+            exit(1);
+        }
+
+        if(recv(sock, buffer_de_scriere, 1024, 0) < 0){
+            printf("[-]Error in receiving data.\n");
+        }else{
+            printf("Server: \t%s\n", buffer_de_scriere);
+        }
+    }
+
+    // send(sock , buffer_de_scriere, strlen(buffer_de_scriere) , 0 );
+    // printf("Am trimis mesaj catre server!\n");
+    // verificare_citire_mesaj = read( sock , buffer_de_scriere, 1024);
+    // printf("%s\n", buffer_de_scriere );
 
 	delete buffer_de_citire;
 	delete buffer_de_scriere;
@@ -133,7 +151,7 @@ int conectare_la_server(){
 int main()
 {
     Motion m;
-    m.scriere_fisier();
+   // m.scriere_fisier();
     //citire_fisier();
 
 
