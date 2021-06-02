@@ -64,3 +64,6 @@ Raportul de analiză se găsește [aici](https://github.com/LupuAndreea/IoT-Lamp
      
   3. ***Curl***
         Pentru a rula curl, se utilizează o comandă de tipul curl urmat de url-ul dorit. Spre exemplu, curl    `http://localhost:8080/command/1`.
+
+
+Linkul catre Trello [Trello](https://trello.com/b/TnOty7z8/to-do-list)
