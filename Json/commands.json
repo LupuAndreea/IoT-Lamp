@@ -1,0 +1,140 @@
+{
+	"device-name": "Smart Lamp",
+    "device-type": "Lamp",
+    "buffers-count": 1,
+    "input-buffers":{
+        "protocol": "HTTP",
+        "prefix": "curl -XPOST 'http://127.0.0.1:8080/'",
+            
+
+    	"1":{
+
+    		"name":"Standard command",
+            
+               "led": {
+
+                    "status_led" :true,
+                    "color" : "white",
+                    "intensity" : 80,
+                    "status_timer": true,
+                    "timer" : 60 
+
+                      },
+    		
+    		  "sound": {
+
+                     "notifications" : false,
+
+                     "status_sound" : false
+                     },
+
+              "movement":{
+
+                    "movement_status": true,
+                    "movement_range" : 100
+                         }
+           
+
+           },
+
+        "2":{
+            "name": "Study command",
+
+            "led":{
+
+                "status_led" : true,
+                "color": "white",
+                "intensity": 100,
+                "status_timer": true,
+                "timer" : 70 
+            },
+
+
+            "sound": {
+                "notifications" : false,
+                "status_sound" : true,
+                "sound_type" : "classic",
+                "volume" : 65535
+            },
+
+            "movement":{
+                "movement_status": false
+            }           
+          
+        },
+
+        "3":
+        {
+            "name" : "Party command",
+
+            "led":{
+                "status_led" : true,
+                "color" : ["red","blue","green","raspberry","magenta","cyan"],
+                "intensity" : [0,100]
+            },
+
+            "sound":
+            { 
+                "notifications" : true,
+                "status_sound" : true,
+                "sound_type": "party",
+                "volume": 100
+            },
+
+            "movement":{
+
+                 "movement_status": false
+            }              
+
+        },
+
+        "4":
+        {
+            "name" : "Clock command",
+
+            "led" :{
+
+                "status_led" : true,
+                "color" : "white",
+                "intensity" : 100
+            },
+
+            "sound": {
+                "notifications" : true,
+                "status_sound" : true,
+                "sound_type" : "alarm",
+                "volume " : 85
+            },
+
+            "movement" :{
+                "movement_status" : true,
+                "movement_range" : 20
+            }
+         
+        },
+
+        "5":
+        {
+            "name" : "Alarm command",
+
+            "led" :{
+                "status_led" : false
+            },
+
+            "sound" : {
+                "notifications" : true,
+                "status_sound" : false,
+                "sound_type" : "danger alarm"
+            },
+
+            "movement" : {
+                "movement_status" : true,
+                "movement_range" : 100
+            }
+        }
+
+
+
+    }
+
+}
