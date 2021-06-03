@@ -1,6 +1,6 @@
 # SmartLamp
 
-![Demo](https://user-images.githubusercontent.com/48756694/120623799-b78c4c00-c468-11eb-99aa-c60c6a856d65.mp4)
+[Demo](https://user-images.githubusercontent.com/48756694/120623799-b78c4c00-c468-11eb-99aa-c60c6a856d65.mp4)
 
 Raportul de analiză se găsește [aici](https://github.com/LupuAndreea/IoT-Lamp/blob/main/Raport_Final_Smart_Lamp.pdf)
 
