@@ -68,4 +68,4 @@ Offline Demo [aici](https://youtu.be/0RtRmJab8Y4)
         Pentru a rula curl, se utilizează o comandă de tipul curl urmat de url-ul dorit. Spre exemplu, curl    `http://localhost:8080/command/1`.
 
 
-Linkul catre Trello [Trello](https://trello.com/b/TnOty7z8/to-do-list)
+Linkul catre [Trello](https://trello.com/b/TnOty7z8/to-do-list)
