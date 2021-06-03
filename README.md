@@ -2,7 +2,7 @@
 
 Raportul de analiză se găsește [aici](https://github.com/LupuAndreea/IoT-Lamp/blob/main/Raport_Final_Smart_Lamp.pdf)
 
-Offline Demo [aici](https://youtu.be/0RtRmJab8Y4)
+Offline Demo [aici](https://youtu.be/0RtRmJab8Y4) și [MakeDemo](https://github.com/LupuAndreea/IoT-Lamp/blob/main/MakeDemoApp.md)
 
 ## **Cerințe de sistem**
 
